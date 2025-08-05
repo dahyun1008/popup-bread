@@ -1,4 +1,4 @@
-package com.bread.popupbread.domain.user.model;
+package com.bread.popupbread.domain.user;
 
 public enum Role {
     USER,
