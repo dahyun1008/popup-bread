@@ -1,6 +1,7 @@
 package com.bread.popupbread.domain.user.controller;
 
 import com.bread.popupbread.domain.user.service.UserService;
+import com.bread.popupbread.global.exception.auth.MissingCodeException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,12 @@ public class UserController {
 
     @GetMapping("/kakao/callback")
     public ResponseEntity<Void> kakaoCallback(
-            @RequestParam("code") String code,
+            @RequestParam(value = "code", required = false) String code,
             HttpServletResponse response
     ) {
+        if (code == null || code.isBlank()) {
+            throw new MissingCodeException("인가코드 누락");
+        }
         String jwt = userService.loginWithKakao(code);
 
         ResponseCookie cookie = ResponseCookie.from("access-token", jwt)
