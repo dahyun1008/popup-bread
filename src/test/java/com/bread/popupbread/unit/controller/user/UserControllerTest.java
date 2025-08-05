@@ -2,6 +2,8 @@ package com.bread.popupbread.unit.controller.user;
 
 import com.bread.popupbread.domain.user.controller.UserController;
 import com.bread.popupbread.domain.user.service.UserService;
+import com.bread.popupbread.global.exception.auth.AuthServiceException;
+import com.bread.popupbread.global.exception.auth.IllegalCodeException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -55,22 +57,22 @@ public class UserControllerTest {
     @Test
     void 잘못된_인가코드일_경우_에러쿼리포함_로그인페이지_리다이렉트() throws Exception {
         String invalidCode = "invalid-code";
-        when(userService.loginWithKakao(invalidCode)).thenThrow(new IllegalArgumentException("잘못된 인가코드"));
+        when(userService.loginWithKakao(invalidCode)).thenThrow(new IllegalCodeException("잘못된 인가코드"));
 
         mockMvc.perform(get("/api/auth/kakao/callback")
                 .param("code", invalidCode))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/login?error=invalid_code"));
+                .andExpect(redirectedUrl("/login?error=illegal_code"));
     }
 
     @Test
     void 서비스_내부_예외발생시_에러쿼리포함_로그인페이지_리다이렉트() throws Exception {
         String authCode = "valid-but-fails-in-service";
-        when(userService.loginWithKakao(authCode)).thenThrow(new RuntimeException("내부 에러"));
+        when(userService.loginWithKakao(authCode)).thenThrow(new AuthServiceException("내부 에러"));
 
         mockMvc.perform(get("/api/auth/kakao/callback")
                 .param("code", authCode))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl("/login?error=internal_error"));
+                .andExpect(redirectedUrl("/login?error=auth_service"));
     }
 }
