@@ -44,4 +44,33 @@ public class UserControllerTest {
                 .andExpect(cookie().value("access-token", expectedJwt))
                 .andExpect(cookie().httpOnly("access-token", true));
     }
+
+    @Test
+    void 인가코드_없이_콜백요청시_에러쿼리포함_로그인페이지_리다이렉트() throws Exception {
+        mockMvc.perform(get("/api/auth/kakao/callback"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/login?error=missing_code"));
+    }
+
+    @Test
+    void 잘못된_인가코드일_경우_에러쿼리포함_로그인페이지_리다이렉트() throws Exception {
+        String invalidCode = "invalid-code";
+        when(userService.loginWithKakao(invalidCode)).thenThrow(new IllegalArgumentException("잘못된 인가코드"));
+
+        mockMvc.perform(get("/api/auth/kakao/callback")
+                .param("code", invalidCode))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/login?error=invalid_code"));
+    }
+
+    @Test
+    void 서비스_내부_예외발생시_에러쿼리포함_로그인페이지_리다이렉트() throws Exception {
+        String authCode = "valid-but-fails-in-service";
+        when(userService.loginWithKakao(authCode)).thenThrow(new RuntimeException("내부 에러"));
+
+        mockMvc.perform(get("/api/auth/kakao/callback")
+                .param("code", authCode))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/login?error=internal_error"));
+    }
 }
