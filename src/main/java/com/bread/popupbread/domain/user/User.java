@@ -1,10 +1,8 @@
-package com.bread.popupbread.domain.user.entity;
+package com.bread.popupbread.domain.user;
 
 
-import com.bread.popupbread.domain.user.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
