@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>팝업 목록</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script defer th:src="@{/js/popup-list.js}"></script>
+</head>
+<body>
+
+<!-- 네비게이션 -->
+<div class="navbar">
+    <a href="/popups">
+        <img src="/images/logo.webp" alt="세모빵 로고" class="logo">
+    </a>
+    <a href="/popups/new" class="add-btn">팝업 소식 추가</a>
+</div>
+
+<!-- 지역 필터 -->
+<div class="filter-bar">
+    <button class="region-btn" data-region="서울">서울</button>
+    <button class="region-btn" data-region="온라인">온라인</button>
+    <button class="region-btn" data-region="경기">경기</button>
+    <button class="region-btn" data-region="부산">부산</button>
+    <button class="region-btn" data-region="인천">인천</button>
+    <button class="region-btn" data-region="대구">대구</button>
+</div>
+
+<!-- 진행중 -->
+<h2 style="padding: 16px;">진행중</h2>
+
+<!-- 팝업 카드 (SSR로 초기 렌더링) -->
+<div id="popupGrid" class="popup-grid">
+    <a th:each="popup : ${initialPopups}"
+       th:href="@{'/popups/' + ${popup.popupId}}"
+       class="popup-card"
+       th:attr="data-cover-key=${popup.coverImageUrl}">
+        <img th:if="${popup.coverImageUrl != null}"
+             src="/images/bread.jpg" alt="팝업 이미지"> <!-- presigned로 교체 예정 -->
+        <img th:if="${popup.coverImageUrl == null}"
+             src="/images/bread.jpg" alt="기본 이미지">
+        <div class="info">
+            <h2 th:text="${popup.title}">팝업 제목</h2>
+            <p th:text="${popup.place}">장소</p>
+            <p th:text="${popup.startDate} + ' ~ ' + ${popup.endDate}">기간</p>
+        </div>
+    </a>
+</div>
+
+<!-- 무한 스크롤 초기 상태 -->
+<input type="hidden" id="nextCursor" th:value="${paging.nextCursor}">
+<input type="hidden" id="hasNext" th:value="${paging.hasNext}">
+
+</body>
+</html>

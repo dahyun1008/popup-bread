@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>팝업 소식 추가</title>
+    <!-- 기본 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .image-box {
+            width: 150px;
+            height: 150px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #999;
+        }
+        .image-preview {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .image-preview div {
+            position: relative;
+        }
+        .image-preview img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            border: none;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 1rem;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <a href="/popups">
+        <img src="/images/logo.webp" alt="세모빵 로고" class="logo">
+    </a>
+    <button id="submitBtn" class="add-btn" type="button">완료</button>
+</div>
+
+<div class="form">
+    <h2>팝업 소식 추가하기</h2>
+
+    <!-- 이미지 등록 -->
+    <div class="image-upload">
+        <label for="popupImages" class="image-box">+</label>
+        <input type="file" id="popupImages" accept=".jpg,.jpeg,.png,.webp,.heic" multiple style="display:none;">
+        <div id="imagePreview" class="image-preview"></div>
+    </div>
+
+    <!-- 팝업 상호명 -->
+    <div>
+        <label>팝업 상호명</label>
+        <input type="text" id="popupTitle" placeholder="예: 이웃집 통통이">
+    </div>
+
+    <!-- 장소 -->
+    <div>
+        <label>장소</label>
+        <div class="location-select">
+            <div class="regions">
+                <button type="button" class="region-btn" data-region="온라인">온라인</button>
+                <button type="button" class="region-btn" data-region="서울">서울</button>
+                <button type="button" class="region-btn" data-region="경기">경기</button>
+                <button type="button" class="region-btn" data-region="부산">부산</button>
+                <button type="button" class="region-btn" data-region="인천">인천</button>
+                <button type="button" class="region-btn" data-region="대구">대구</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세 장소 -->
+    <div>
+        <label>상세 장소</label>
+        <input type="text" id="popupDetailLocation" placeholder="예: 신강 → 신세계 강남점">
+    </div>
+
+    <!-- 일정 -->
+    <div>
+        <label>일정</label>
+        <input type="text" id="dateRange" style="display:none;">
+    </div>
+</div>
+
+<!-- 토스트 메시지 -->
+<script src="/js/toast.js"></script>
+
+<!-- flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/ko.js"></script>
+
+<!-- HEIC 변환 -->
+<script src="https://cdn.jsdelivr.net/npm/heic2any/dist/heic2any.min.js"></script>
+
+<!-- 페이지 전용 JS -->
+<script src="/js/popup-new.js"></script>
+
+<script>
+    // flatpickr 초기화
+    flatpickr("#dateRange", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        inline: true,
+        locale: "ko"
+    });
+</script>
+</body>
+</html>
