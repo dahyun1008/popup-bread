@@ -1,8 +1,12 @@
-package com.bread.popupbread.global.exception;
+package com.bread.popupbread.global.exception.advice;
 
+import com.bread.popupbread.global.exception.BaseException;
 import com.bread.popupbread.global.exception.auth.AuthServiceException;
 import com.bread.popupbread.global.exception.auth.IllegalCodeException;
 import com.bread.popupbread.global.exception.auth.MissingCodeException;
+import com.bread.popupbread.global.exception.popup.LocationNotFoundException;
+import com.bread.popupbread.global.exception.popup.PopupNotFoundException;
+import com.bread.popupbread.global.exception.popup.PopupNotFoundViewException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.net.URI;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class ViewExceptionHandler {
     private ResponseEntity<Void> redirectToLoginWithError(String errorCode){
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create("/login?error=" + errorCode))
@@ -31,5 +35,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthServiceException.class)
     public ResponseEntity<Void> handleAuthServiceException() {
         return redirectToLoginWithError("auth_service");
+    }
+
+    @ExceptionHandler({PopupNotFoundViewException.class,})
+    public String handleException(BaseException ex) {
+        return "error/" + ex.getErrorCode().getHttpStatus();
     }
 }
