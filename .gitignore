@@ -36,5 +36,11 @@ out/
 ### VS Code ###
 .vscode/
 
+### MocOS 폴더 관리 메타데이터 ###
+.DS_Store
+src/.DS_Store
+
 # 보안 민감 정보 무시 (예: application.yml)
 application-*.yml
+src/main/resources/secret/
+
