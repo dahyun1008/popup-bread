@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import java.time.LocalDateTime;
 
 @EntityListeners(AuditingEntityListener.class)
-@EnableJpaAuditing
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
