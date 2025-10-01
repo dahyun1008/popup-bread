@@ -3,8 +3,8 @@ package com.bread.popupbread.domain.user.external.kakao;
 import com.bread.popupbread.domain.user.dto.KakaoUserInfo;
 import com.bread.popupbread.domain.user.dto.KakaoUserResponse;
 import com.bread.popupbread.global.config.properties.KakaoProperties;
+import com.bread.popupbread.global.exception.auth.AuthServiceException;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpEntity;
@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class KakaoOAuthClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final KakaoProperties kakaoProperties;
 
     public String getAccessToken(String code) {
@@ -38,19 +38,24 @@ public class KakaoOAuthClient {
         params.add("redirect_uri", kakaoProperties.getRedirectUri());
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                tokenUri,
-                HttpMethod.POST,
-                request,
-                new ParameterizedTypeReference<Map<String, Object>>() {}
-        );
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    tokenUri,
+                    HttpMethod.POST,
+                    request,
+                    new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
 
-        Map<String, Object> body = response.getBody();
-        if (body == null || !body.containsKey("access_token")) {
-            throw new IllegalStateException("카카오 응답에 access_token이 없습니다.");
+            Map<String, Object> body = response.getBody();
+            if (body == null || !body.containsKey("access_token")) {
+                throw new AuthServiceException("카카오 응답에 access_token이 없습니다.");
+            }
+
+            return (String) body.get("access_token");
+        } catch (Exception e) {
+            e.printStackTrace(); // 임시 디버깅
+            throw new AuthServiceException("카카오 OAuth 서버에서 access token을 받아오는 데 실패했습니다.", e);
         }
-
-        return (String) body.get("access_token");
     }
 
     public KakaoUserInfo getUserInfo(String accessToken) {
@@ -60,17 +65,22 @@ public class KakaoOAuthClient {
         headers.setBearerAuth(accessToken);
 
         HttpEntity<Void> request = new HttpEntity<>(headers);
-        ResponseEntity<KakaoUserResponse> response = restTemplate.exchange(userInfoUri, HttpMethod.GET, request, KakaoUserResponse.class);
+        try {
+            ResponseEntity<KakaoUserResponse> response = restTemplate.exchange(userInfoUri, HttpMethod.GET, request, KakaoUserResponse.class);
 
-        KakaoUserResponse body = response.getBody();
-        if (body == null || body.getKakao_account() == null || body.getKakao_account().getProfile() == null) {
-            throw new IllegalStateException("카카오 사용자 정보가 비정상적입니다.");
+            KakaoUserResponse body = response.getBody();
+            if (body == null || body.getKakao_account() == null || body.getKakao_account().getProfile() == null) {
+                throw new AuthServiceException("카카오 사용자 정보가 비정상적입니다.");
+            }
+
+            return KakaoUserInfo.builder()
+                    .kakaoId(body.getId())
+                    .nickname(body.getKakao_account().getProfile().getNickname())
+                    .email(body.getKakao_account().getEmail())
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace(); // 임시 디버깅
+            throw new AuthServiceException("카카오 유저 정보 조회 에러 발생했습니다.", e);
         }
-
-        return KakaoUserInfo.builder()
-                .kakaoId(body.getId())
-                .nickname(body.getKakao_account().getProfile().getNickname())
-                .email(body.getKakao_account().getEmail())
-                .build();
     }
 }
