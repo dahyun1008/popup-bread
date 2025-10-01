@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>세모빵 로그인</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column; /* 수직 정렬 추가 */
+            align-items: center;
+        }
+
+        .logo {
+            width: 200px;
+            margin-bottom: 48px; /* 버튼과 간격 확보 */
+        }
+
+        .kakao-btn {
+            padding: 14px 48px;
+            background-color: #FEE500;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="/images/logo.webp" alt="세모빵 로고" class="logo" />
+    <a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=5c0d17f3205e68cdce2aafe4dc54af01&redirect_uri=http://localhost:8080/api/auth/kakao/callback"
+       class="kakao-btn">
+        카카오 로그인
+    </a>
+</div>
+</body>
+</html>
